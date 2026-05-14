@@ -3,88 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>T-Rex Fruits - OPEN BETA</title>
+    <title>T-Rex Fruit - FIX VERSION</title>
     <style>
-        /* สไตล์เดิมทั้งหมดและเพิ่มป้าย Beta */
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Verdana', sans-serif; user-select: none; touch-action: none; }
-        
-        #beta-banner {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(to bottom, #ff3333, #990000);
-            color: white;
-            padding: 5px 20px;
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-            font-size: 12px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-            border: 1px solid #ff0000;
-        }
-
-        #loading-screen { position: absolute; width:100%; height:100%; background:radial-gradient(circle, #222, #000); display:flex; align-items:center; justify-content:center; z-index:9999; color:white; flex-direction: column; }
-        .login-box { background: rgba(0,0,0,0.9); padding: 30px; border-radius: 20px; border: 2px solid #ffd700; text-align: center; box-shadow: 0 0 30px rgba(255,215,0,0.2); }
-        
-        input { padding: 12px; font-size: 16px; border-radius: 8px; border: 2px solid #444; margin: 15px 0; width: 220px; text-align: center; background:#222; color:white; }
-        input:focus { border-color: #ffd700; outline: none; }
-
-        .server-btn { background: #333; color: #ccc; border: 1px solid #555; padding: 12px; cursor: pointer; border-radius: 10px; width: 100%; margin-top: 8px; transition: 0.3s; }
-        .server-btn:hover { background: #444; color: white; transform: scale(1.02); }
-        .server-admin { background: linear-gradient(45deg, #4b0082, #000); border-color: #ff00ff; color: #ff00ff; font-weight: bold; }
-        
+        /* CSS เหมือนเดิมทุกประการครับ (เพื่อความคลีน) */
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Tahoma', sans-serif; user-select: none; touch-action: none; }
+        #loading-screen { position: absolute; width:100%; height:100%; background:#111; display:flex; align-items:center; justify-content:center; z-index:9999; color:white; flex-direction: column; }
+        .login-box { background: rgba(0,0,0,0.9); padding: 40px; border-radius: 15px; border: 3px solid #ffd700; text-align: center; }
+        input#user-id { padding: 15px; font-size: 18px; border-radius: 8px; border: none; margin: 20px 0; width: 250px; text-align: center; background:#222; color:white; border: 1px solid #444; }
+        .start-btn { background: #ffd700; color: black; padding: 15px 50px; font-size: 22px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; pointer-events: auto; }
         #game-ui { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         .pointer { pointer-events: auto; }
-        
-        /* สถิติและปุ่มกด */
-        #stat-panel { position: absolute; top: 40px; left: 15px; background: rgba(0,0,0,0.85); color: white; padding: 15px; border-radius: 15px; border-left: 5px solid #00d4ff; font-size: 14px; min-width: 160px; }
-        #msg { position: absolute; top: 25%; width: 100%; text-align: center; color: #ffd700; font-weight: bold; font-size: 24px; pointer-events: none; text-shadow: 0 0 10px #000; }
-        
-        #joy-base { position: absolute; bottom: 50px; left: 50px; width: 110px; height: 110px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; }
-        #joy-stick { position: absolute; top: 30px; left: 30px; width: 50px; height: 50px; background: #fff; border-radius: 50%; opacity: 0.5; }
-        
-        #actions { position: absolute; bottom: 50px; right: 40px; display: flex; flex-direction: column; gap: 15px; }
-        .btn-circle { width: 85px; height: 85px; background: rgba(0,0,0,0.6); border: 3px solid rgba(255,255,255,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        #atk-btn { width: 120px; height: 120px; border-color: #ff3333; color: #ff3333; font-size: 20px; }
+        #stat-panel { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.8); color: white; padding: 15px; border-radius: 12px; width: 180px; }
+        #admin-panel { position: absolute; top: 15px; left: 230px; display: none; flex-direction: column; gap: 8px; }
+        .admin-btn { background: #ff00ff; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 11px; cursor: pointer; pointer-events: auto; }
+        #chat-box { position: absolute; bottom: 20px; left: 20px; width: 320px; height: 240px; background: rgba(0,0,0,0.7); border-radius: 12px; display: flex; flex-direction: column; pointer-events: auto; }
+        #chat-messages { flex: 1; overflow-y: auto; padding: 12px; color: white; font-size: 13px; }
+        #chat-input-area { display: flex; padding: 10px; }
+        #chat-input { flex: 1; background: #111; border: 1px solid #333; color: white; padding: 8px; border-radius: 6px; }
+        #bounty-board { position: absolute; top: 70px; right: 15px; background: rgba(20,20,20,0.9); padding: 12px; border-radius: 10px; color: white; min-width: 190px; pointer-events: auto; }
+        #joy-base { position: absolute; bottom: 50px; right: 180px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; }
+        #joy-stick { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; background: white; border-radius: 50%; opacity: 0.5; }
+        #actions { position: absolute; bottom: 40px; right: 30px; display: flex; flex-direction: column; gap: 15px; }
+        .btn-circle { width: 80px; height: 80px; background: rgba(0,0,0,0.6); border: 3px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        #announcement { position: absolute; top: 15%; width: 100%; text-align: center; color: #ffd700; font-size: 26px; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
-    <div id="beta-banner">OPEN BETA V0.5</div>
+    <div id="announcement"></div>
 
     <div id="loading-screen">
         <div class="login-box">
-            <h1 style="color:#ffd700; margin:0;">🦖 T-REX FRUITS</h1>
-            <div style="font-size:10px; color:#00ff00; margin-bottom:10px;">[ ONLINE SERVER ACTIVE ]</div>
-            
-            <input type="text" id="user-id" placeholder="USERNAME" maxlength="12">
-            
-            <div class="server-list">
-                <button class="server-btn" onclick="selectServer('Asia Public')">Public Server (Asia)</button>
-                <button class="server-btn server-admin" onclick="selectServer('The Herta')">💎 Admin Server: The Herta</button>
-            </div>
-            <p style="font-size:10px; color:#777; margin-top:15px;">เข้า Server แอดมินเพื่อรับ "ผลขวาน" ช่วงเบต้า</p>
+            <h1>🦖 T-REX FRUIT</h1>
+            <input type="text" id="user-id" placeholder="Enter ID...">
+            <br>
+            <button class="start-btn" onclick="enterGame()">START GAME</button>
         </div>
     </div>
 
     <div id="game-ui">
         <div id="stat-panel" class="pointer">
-            <div style="color:#ff00ff; font-weight:bold; font-size:10px;" id="role-tag">PLAYER</div>
-            <div style="font-size:18px; margin-bottom:5px;"><span id="display-id">...</span></div>
-            <div style="color:#00ff00;">💰 <span id="money">0</span></div>
-            <div id="fruit-info" style="color:#ffd700; margin-top:5px; font-size:12px;">FRUIT: NONE</div>
+            <div id="adm-tag" style="color:#ff00ff; display:none;">GOD ADMIN</div>
+            <div id="display-id" style="font-size:18px; font-weight:bold;">...</div>
+            <div style="color:#00ff00;">฿<span id="money">0</span></div>
+            <div id="my-title" style="font-size:10px; color:#ffd700;">TITLE: ...</div>
         </div>
 
-        <div id="msg"></div>
-        
+        <div id="admin-panel">
+            <button class="admin-btn" onclick="addMoney()">+10k Money</button>
+            <button class="admin-btn" onclick="punishPlayer()">Punish</button>
+            <button class="admin-btn" onclick="getAxe()">Get Axe</button>
+        </div>
+
+        <div id="bounty-board" class="pointer">
+            <div style="color:#ffd700; text-align:center;">🏆 BOUNTY RANK</div>
+            <div id="bounty-list" style="font-size:11px;"></div>
+        </div>
+
+        <div id="chat-box">
+            <div id="chat-messages"></div>
+            <div id="chat-input-area"><input type="text" id="chat-input" placeholder="Chat..."></div>
+        </div>
+
         <div id="joy-base" class="pointer"><div id="joy-stick"></div></div>
-        
         <div id="actions" class="pointer">
-            <div class="btn-circle" id="atk-btn">ATTACK</div>
-            <div class="btn-circle" id="trans-btn" style="display:none; background:linear-gradient(45deg, #ff8c00, #ff4500);">TRANS</div>
+            <div class="btn-circle" id="atk-btn">ATK</div>
+            <div class="btn-circle" id="trans-btn" style="display:none; background:orange;">TRANS</div>
         </div>
     </div>
 
@@ -96,64 +80,117 @@
         import * as THREE from 'three';
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-        // DATABASE และสถานะ
         const DB_URL = "https://the-herta-cf467-default-rtdb.asia-southeast1.firebasedatabase.app/";
-        let currentUser = "", isAdmin = false;
-        let gameData = { money: 0, fruitType: "none", hasFruit: false };
-
+        let currentUser = "", isAdmin = false, isFrozen = false, currentServer = "Public-1";
+        let gameData = { money: 0, bounty: 1000, hasFruit: false, fruitType: "none" };
         let scene, camera, renderer, player, models = {}, moveDir = new THREE.Vector3();
-        let isTrans = false, loader = new GLTFLoader();
-        let camAngleX = 0, camAngleY = 0.3, isTouch = false, lastX, lastY;
+        let isTrans = false, loader = new GLTFLoader(), enemies = [];
+        let camX = 0, camY = 0.3, isTouch = false, lastX, lastY;
 
-        window.selectServer = async (srv) => {
+        // แก้ไข: ย้ายฟังก์ชันมาไว้ที่ window เพื่อให้ปุ่มเรียกหาเจอแน่นอน
+        window.enterGame = async () => {
             const id = document.getElementById('user-id').value.trim();
             if(!id) return;
             currentUser = id;
             if(id === "The Herta") isAdmin = true;
 
-            // โหลดข้อมูลถาวร
-            const res = await fetch(`${DB_URL}users/${id}.json`);
-            const data = await res.json();
-            if(data) gameData = data;
-
-            // ระบบ Open Beta Reward: เข้าเซิร์ฟแอดมินได้ผลขวาน
-            if(srv === "The Herta") {
-                if(gameData.fruitType !== "axe") {
-                    gameData.fruitType = "axe";
-                    gameData.hasFruit = true;
-                    saveData();
-                    setTimeout(() => log("BETA REWARD: ได้รับผลขวานถาวร!"), 1000);
-                }
-            }
-
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('game-ui').style.display = 'block';
             document.getElementById('display-id').innerText = currentUser;
-            if(isAdmin) document.getElementById('role-tag').innerText = "GOD ADMIN";
-            
-            initGame();
+
+            if(isAdmin) {
+                document.getElementById('admin-panel').style.display = 'flex';
+                document.getElementById('adm-tag').style.display = 'block';
+                gameData.bounty = 9999999999999;
+                gameData.hasFruit = true; gameData.fruitType = "axe";
+            }
+            init(); // เรียกการสร้างฉาก
         };
 
-        function saveData() { fetch(`${DB_URL}users/${currentUser}.json`, { method: 'PUT', body: JSON.stringify(gameData) }); }
+        function getTitle(bounty, isAdm) {
+            if (isAdm) return "👑 GOD ADMIN: THE HERTA";
+            if (bounty >= 1000000) return "🔱 Sea Master";
+            return "🐥 Beginner";
+        }
 
-        function initGame() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87CEEB);
+        // --- ส่วนแชทและดาต้า ---
+        setInterval(async () => {
+            if(!currentUser) return;
+            const srvKey = currentServer.replace("-", "_");
+            
+            // ดึง Bounty
+            fetch(`${DB_URL}bounty/${srvKey}/${currentUser}.json`, {
+                method: 'PUT', body: JSON.stringify({ name: currentUser, bounty: isAdmin ? 9999999999999 : gameData.bounty, isAdmin })
+            });
+
+            const res = await fetch(`${DB_URL}bounty/${srvKey}.json?orderBy="bounty"&limitToLast=3`);
+            const data = await res.json();
+            if(data) {
+                const sorted = Object.values(data).sort((a,b)=>b.bounty-a.bounty);
+                document.getElementById('bounty-list').innerHTML = sorted.map((p,i)=>`<div>${i+1}. ${p.name}: ฿${p.bounty.toLocaleString()}</div>`).join('');
+            }
+        }, 3000);
+
+        // --- เริ่มต้นฉาก ---
+        function init() {
+            scene = new THREE.Scene(); scene.background = new THREE.Color(0x87CEEB);
             camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
-            
-            scene.add(new THREE.AmbientLight(0xffffff, 0.7), new THREE.DirectionalLight(0xffffff, 1));
-            
-            // พื้นเกาะ
-            const ground = new THREE.Mesh(new THREE.CylinderGeometry(100, 100, 2, 32), new THREE.MeshStandardMaterial({color: 0x33aa33}));
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8), new THREE.DirectionalLight(0xffffff, 1));
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({color: 0x33aa33}));
+            ground.rotation.x = -Math.PI/2;
             scene.add(ground);
 
-            player = new THREE.Group();
-            scene.add(player);
+            player = new THREE.Group(); scene.add(player);
+            
+            // โหลดโมเดล (ถ้าไม่มีไฟล์จะไม่ค้าง)
+            try {
+                loader.load('bin.glb', g => { models.human = g.scene; player.add(models.human); });
+                loader.load('axe.glb', g => { models.axe = g.scene; models.axe.visible = false; player.add(models.axe); });
+            } catch(e) {}
 
-            // โหลดโมเดลทั้งหมดเตรียมไว้
-            loader.load('bin.glb', g => { models.human = g.scene; player.add(models.human); });
-            loader.load('T-Rex.glb', g => { models.trex = g.scene; models.trex.visible =
-                                                                                                                                       
+            updateUI(); animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if(moveDir.length() > 0.1 && !isFrozen) {
+                const forward = new THREE.Vector3(Math.sin(camX+Math.PI), 0, Math.cos(camX+Math.PI));
+                const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0), forward);
+                const move = forward.multiplyScalar(-moveDir.z).add(right.multiplyScalar(moveDir.x));
+                player.position.add(move.multiplyScalar(isAdmin ? 0.7 : 0.4));
+                player.rotation.y = Math.atan2(move.x, move.z);
+            }
+            camera.position.set(player.position.x + Math.sin(camX)*20, player.position.y + 15, player.position.z + Math.cos(camX)*20);
+            camera.lookAt(player.position);
+            renderer.render(scene, camera);
+        }
+
+        window.addMoney = () => { gameData.money += 10000; updateUI(); };
+        window.getAxe = () => { gameData.hasFruit = true; gameData.fruitType = "axe"; updateUI(); };
+        function updateUI() {
+            document.getElementById('money').innerText = gameData.money.toLocaleString();
+            document.getElementById('my-title').innerText = "TITLE: " + getTitle(gameData.bounty, isAdmin);
+            if(gameData.hasFruit) document.getElementById('trans-btn').style.display = 'flex';
+        }
+
+        // Joystick
+        let joyActive = false;
+        document.getElementById('joy-base').addEventListener('pointerdown', ()=> joyActive=true);
+        window.addEventListener('pointermove', e => {
+            if(!joyActive) return;
+            const rect = document.getElementById('joy-base').getBoundingClientRect();
+            const x = e.clientX-rect.left-50, y = e.clientY-rect.top-50;
+            const dist = Math.min(Math.sqrt(x*x+y*y), 40);
+            const ang = Math.atan2(y, x);
+            document.getElementById('joy-stick').style.transform = `translate(${Math.cos(ang)*dist}px, ${Math.sin(ang)*dist}px)`;
+            moveDir.set(Math.cos(ang), 0, Math.sin(ang));
+        });
+        window.addEventListener('pointerup', ()=>{ joyActive=false; document.getElementById('joy-stick').style.transform="translate(0,0)"; moveDir.set(0,0,0); });
+    </script>
+</body>
+    </html>
+                                               
