@@ -1,233 +1,307 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Island Survival - Official v1.0 (Firebase Edition)</title>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.9.0/nipplejs.min.js"></script>
-
+    <title>T-Rex Online PVP Master</title>
     <style>
-      body { margin: 0; overflow: hidden; user-select: none; -webkit-tap-highlight-color: transparent; background: #000; font-family: sans-serif; }
-      #main-menu { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000; z-index: 1000; color: white; }
-      
-      /* หน้าเลือกตัวละคร (ID) สำหรับออนไลน์ */
-      #online-setup { display: none; flex-direction: column; align-items: center; }
-      .role-btn { padding: 10px 30px; margin: 5px; border-radius: 8px; border: 2px solid #fff; cursor: pointer; color: white; font-weight: bold; width: 200px; }
-
-      .menu-btn { padding: 15px 50px; font-size: 20px; border-radius: 10px; cursor: pointer; border: none; margin: 10px; font-weight: bold; background: #00ffcc; color: black; box-shadow: 0 0 15px rgba(0,255,204,0.4); }
-      #damage-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 0, 0, 0.5); z-index: 996; pointer-events: none; display: none; }
-      #ui-layer { position: absolute; top: 20px; left: 20px; z-index: 999; color: white; font-family: 'Courier New', sans-serif; pointer-events: none; }
-      #health-bar { width: 200px; height: 18px; background: rgba(51, 51, 51, 0.8); border: 2px solid white; margin-top: 5px; }
-      #health-fill { width: 100%; height: 100%; background: #ff0000; transition: width 0.2s; }
-      #customize-btn { position: absolute; top: 20px; right: 20px; z-index: 1000; padding: 10px 15px; font-size: 24px; border-radius: 12px; background: rgba(255, 255, 255, 0.2); color: white; border: 2px solid white; cursor: pointer; }
-      #fullscreen-btn { position: absolute; top: 80px; right: 20px; z-index: 1000; padding: 10px 15px; font-size: 18px; border-radius: 12px; background: #8e44ad; color: white; border: 2px solid white; cursor: pointer; font-weight: bold; }
-      #customize-menu { position: absolute; top: 140px; right: 20px; z-index: 1000; background: rgba(0,0,0,0.85); border-radius: 15px; padding: 15px; border: 2px solid #00ffcc; display: flex; flex-direction: column; align-items: center; max-width: 200px; }
-      .skin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .skin-option { width: 70px; height: 70px; cursor: pointer; border: 3px solid #fff; border-radius: 10px; overflow: hidden; background: #333; }
-      .skin-option img { width: 100%; height: 100%; object-fit: contain; }
-      #controls-ui { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; z-index: 998; pointer-events: none; }
-      #joystick-zone { position: absolute; bottom: 40px; left: 40px; width: 120px; height: 120px; pointer-events: auto; }
-      .fire-btn { position: absolute; bottom: 50px; right: 40px; width: 110px; height: 110px; border-radius: 50%; background: rgba(255, 0, 0, 0.7); color: white; border: 5px solid #fff; pointer-events: auto; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; }
-      .hidden { display: none !important; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; user-select: none; touch-action: none; }
+        #loading-screen { position: absolute; width:100%; height:100%; background:#111; display:flex; align-items:center; justify-content:center; z-index:9999; color:white; text-align:center; }
+        .login-box { background: rgba(0,0,0,0.9); padding: 30px; border-radius: 15px; border: 3px solid #ffd700; }
+        input { padding: 12px; font-size: 18px; border-radius: 5px; border: none; margin: 10px 0; width: 220px; text-align: center; background:#333; color:white; }
+        .start-btn { background: #ffd700; color: black; padding: 12px 35px; font-size: 20px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; }
+        
+        #game-ui { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        .pointer { pointer-events: auto; }
+        #stat-panel { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 12px; border-radius: 10px; border: 2px solid #00d4ff; font-size: 14px; }
+        #inv-panel { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 12px; border-radius: 10px; border: 2px solid #ffd700; width: 150px; text-align: center; }
+        
+        #joy-base { position: absolute; bottom: 40px; left: 40px; width: 100px; height: 100px; background: rgba(255,255,255,0.2); border-radius: 50%; }
+        #joy-stick { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; background: white; border-radius: 50%; opacity: 0.6; }
+        #actions { position: absolute; bottom: 40px; right: 30px; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; }
+        .btn-circle { width: 80px; height: 80px; background: rgba(255,255,255,0.3); border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        #atk-btn { width: 110px; height: 110px; background: rgba(255,0,0,0.5); font-size: 20px; }
+        
+        .bar-bg { width: 100%; height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin-top: 5px; border: 1px solid #555; }
+        #hp-fill { height: 100%; background: #ff3333; width: 100%; transition: 0.3s; }
+        #m-fill { height: 100%; background: #00ff00; width: 0%; transition: 0.3s; }
+        #msg { position: absolute; top: 20%; width: 100%; text-align: center; color: #fff; font-weight: bold; font-size: 22px; pointer-events: none; text-shadow: 2px 2px 4px #000; }
     </style>
-  </head>
-  <body>
+</head>
+<body>
 
-    <div id="damage-flash"></div>
-
-    <div id="main-menu">
-      <h1 style="color: #00ffcc; letter-spacing: 5px;">เกาะมหาสนุก</h1>
-      <div id="initial-menu">
-        <button class="menu-btn" onclick="startGame('solo')">เล่นคนเดียว</button>
-        <button class="menu-btn" style="background:#444; color:white; margin-top:15px;" onclick="showOnlineSetup()">ออนไลน์</button>
-      </div>
-      <div id="online-setup">
-        <p>คุณคือใคร? (เลือกให้ไม่ซ้ำกับเพื่อน)</p>
-        <button class="role-btn" style="background:#e67e22;" onclick="startGame('multi', 'P1')">อาจารย์ (P1)</button>
-        <button class="role-btn" style="background:#3498db;" onclick="startGame('multi', 'P2')">พี่ชาย (P2)</button>
-        <button class="role-btn" style="background:#9b59b6;" onclick="startGame('multi', 'P3')">เพื่อน (P3)</button>
-      </div>
+    <div id="loading-screen">
+        <div class="login-box">
+            <h1>🦖 T-REX PVP ONLINE</h1>
+            <div id="login-form">
+                <input type="text" id="user-id" placeholder="ID ผู้เล่น..." maxlength="10"><br>
+                <button class="start-btn" onclick="login()">เข้าสู่โลก T-Rex</button>
+            </div>
+        </div>
     </div>
 
-    <div id="ui-layer" class="hidden">
-      <div style="font-weight: bold; text-shadow: 2px 2px #000;">เลือด: <span id="hp-text">100</span></div>
-      <div id="health-bar"><div id="health-fill"></div></div>
+    <div id="game-ui">
+        <div id="stat-panel" class="pointer">
+            <div style="color: #ffd700; font-weight: bold;">👤 ID: <span id="display-id">...</span></div>
+            <div class="bar-bg" style="height:15px;"><div id="hp-fill"></div></div>
+            <div style="font-size:10px; text-align:center;">HP: <span id="hp-text">100</span> / <span id="max-hp">100</span></div>
+            <hr>
+            <div style="color: #ffd700;">💰 เงิน: <span id="money">0</span></div>
+            <div style="color: #00ff00;">✨ Points: <span id="pts">0</span></div>
+            <div style="margin: 5px 0;">🥊 หมัด: <b id="v-melee">1</b> <button onclick="upStat('melee')">+</button></div>
+            <div style="margin: 5px 0;">🦖 ผล: <b id="v-fruit">1</b> <button onclick="upStat('fruit')">+</button></div>
+        </div>
+
+        <div id="inv-panel" class="pointer">
+            <div id="shop-part"><button onclick="buyFruit()" style="width:100%; padding:10px; cursor:pointer; font-weight:bold;">ซื้อผล T-Rex (100฿)</button></div>
+            <div id="item-part" style="display:none;">
+                <span style="color:#00ff00;">🦖 T-Rex Fruit</span>
+                <button id="equip-btn" onclick="equipFruit()" style="width:100%; margin-top:5px; cursor:pointer;">สวมใส่</button>
+                <div class="bar-bg"><div id="m-fill"></div></div>
+                <small>Mastery: <span id="m-val">0</span>/5</small>
+            </div>
+        </div>
+
+        <div id="msg"></div>
+        <div id="joy-base" class="pointer"><div id="joy-stick"></div></div>
+        <div id="actions" class="pointer">
+            <div class="btn-circle" id="atk-btn">ATTACK</div>
+            <div style="display: flex; gap: 10px;">
+                <div class="btn-circle" id="jump-btn">JUMP</div>
+                <div class="btn-circle" id="trans-btn" style="display:none; background: #ffaa00;">TRANSFORM</div>
+            </div>
+        </div>
     </div>
 
-    <button id="fullscreen-btn" class="hidden">📱 เต็มจอ</button>
-    <button id="customize-btn" class="hidden" onclick="toggleCustomizeMenu()">👕 เปลี่ยนชุด</button>
-    
-    <div id="customize-menu" class="hidden">
-      <p style="color:white; margin:0 0 10px 0; font-size: 14px;">เลือกสกินละคร</p>
-      <div class="skin-grid">
-        <div class="skin-option" onclick="setMySkin('#imgRed')"><img src="jjs.png"></div>
-        <div class="skin-option" onclick="setMySkin('#imgBlue')"><img src="jjkl.png"></div>
-        <div class="skin-option" onclick="setMySkin('#imgHerta')"><img src="The Herta.png"></div>
-        <div class="skin-option" onclick="setMySkin('#imgSparcy')"><img src="Sparcy.png"></div>
-      </div>
-    </div>
-
-    <div id="controls-ui" class="hidden">
-      <div id="joystick-zone"></div>
-      <div id="shoot-btn" class="fire-btn">ยิง!!</div>
-    </div>
-
-    <a-scene id="scene" renderer="colorManagement: true; exposure: 1.2;">
-      <a-assets>
-        <a-asset-item id="gunModel" src="asd.glb"></a-asset-item>
-        <a-asset-item id="islandModel" src="city.glb"></a-asset-item>
-        <img id="imgRed" src="jjs.png">
-        <img id="imgBlue" src="jjkl.png">
-        <img id="imgHerta" src="The Herta.png">
-        <img id="imgSparcy" src="Sparcy.png">
-      </a-assets>
-
-      <a-sky color="#87CEEB"></a-sky>
-      <a-entity light="type: ambient; intensity: 1.8; color: #FFF"></a-entity>
-      <a-entity light="type: directional; intensity: 1.2;" position="1 10 5"></a-entity>
-
-      <a-plane position="0 0 0" rotation="-90 0 0" width="1000" height="1000" material="opacity: 0; transparent: true"></a-plane>
-      <a-entity id="island" gltf-model="#islandModel" position="0 -1.5 -30" scale="0.1 0.1 0.1"></a-entity>
-
-      <a-entity id="rig" position="0 0 0">
-        <a-entity id="camera" camera position="0 1.6 0" look-controls="touchEnabled: true; magicWindowTrackingEnabled: false">
-          <a-entity id="weapon-container" position="0.35 -0.5 -0.8">
-             <a-entity id="weapon" gltf-model="#gunModel" rotation="0 -11 0" scale="0.5 0.5 0.5" visible="false"></a-entity>
-          </a-entity>
-          <a-entity id="crosshair" cursor position="0 0 -1" geometry="primitive: ring; radiusInner: 0.008; radiusOuter: 0.012" material="color: #00ff00; shader: flat" raycaster="objects: .targetable; far: 100"></a-entity>
-        </a-entity>
-        <a-image id="my-avatar" class="avatar-display" src="#imgRed" width="2" height="2" position="0 1 0"></a-image>
-      </a-entity>
-
-      <a-entity id="player-P1" class="targetable" visible="false"><a-image src="#imgRed" width="2" height="2" position="0 1 0"></a-image><a-cone position="0 3.5 0" rotation="180 0 0" radius-bottom="0.2" height="0.4" color="orange"></a-cone></a-entity>
-      <a-entity id="player-P2" class="targetable" visible="false"><a-image src="#imgRed" width="2" height="2" position="0 1 0"></a-image><a-cone position="0 3.5 0" rotation="180 0 0" radius-bottom="0.2" height="0.4" color="cyan"></a-cone></a-entity>
-      <a-entity id="player-P3" class="targetable" visible="false"><a-image src="#imgRed" width="2" height="2" position="0 1 0"></a-image><a-cone position="0 3.5 0" rotation="180 0 0" radius-bottom="0.2" height="0.4" color="violet"></a-cone></a-entity>
-
-      <a-image id="bot-enemy" class="targetable" src="#imgRed" position="0 2 -15" width="5" height="5" visible="false" data-hp="100"></a-image>
-    </a-scene>
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
+    </script>
 
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-      const firebaseConfig = { databaseURL: "https://the-herta-cf467-default-rtdb.firebaseio.com/" };
-      const app = initializeApp(firebaseConfig);
-      const db = getDatabase(app);
+        const DB_URL = "https://the-herta-cf467-default-rtdb.asia-southeast1.firebasedatabase.app/";
+        let currentUser = "";
+        let gameData = { 
+            money: 0, pts: 0, melee: 1, fruit: 1, 
+            hp: 100, maxHp: 100,
+            hasFruit: false, isEquipped: false, mastery: 0 
+        };
+        let otherPlayers = {};
+        let scene, camera, renderer, player, human, trex, loader = new GLTFLoader();
+        let moveDir = new THREE.Vector3(), vY = 0, isTrex = false, isAttacking = false;
 
-      let health = 100;
-      let isMulti = false;
-      let myRole = "";
+        // --- Database & Logic ---
+        window.login = async () => {
+            const id = document.getElementById('user-id').value.trim();
+            if(!id) return alert("กรุณาใส่ ID");
+            currentUser = id;
+            try {
+                const res = await fetch(`${DB_URL}users/${id}.json`);
+                const data = await res.json();
+                if(data) gameData = data;
+                else await saveToServer();
+                
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('game-ui').style.display = 'block';
+                document.getElementById('display-id').innerText = currentUser;
+                updateUI();
+                init3D();
+                startNetwork();
+            } catch(e) { alert("Server Error!"); }
+        };
 
-      window.showOnlineSetup = function() {
-        document.getElementById('initial-menu').classList.add('hidden');
-        document.getElementById('online-setup').style.display = 'flex';
-      }
-
-      window.startGame = function(mode, role) {
-        health = 100; updateUI();
-        document.getElementById('main-menu').classList.add('hidden');
-        document.getElementById('controls-ui').classList.remove('hidden');
-        document.getElementById('ui-layer').classList.remove('hidden');
-        document.getElementById('customize-btn').classList.remove('hidden');
-        document.getElementById('fullscreen-btn').classList.remove('hidden');
-        document.querySelector('#weapon').setAttribute('visible', 'true');
-
-        if (mode === 'solo') {
-          document.getElementById('bot-enemy').setAttribute('visible', 'true');
-        } else {
-          isMulti = true;
-          myRole = role;
-          startFirebaseSync();
+        async function saveToServer() {
+            if(!currentUser) return;
+            fetch(`${DB_URL}users/${currentUser}.json`, { method: 'PUT', body: JSON.stringify(gameData) });
         }
-        initJoystick();
-      }
 
-      function startFirebaseSync() {
-        // ส่งตำแหน่งเรา
-        setInterval(() => {
-          const rig = document.getElementById('rig');
-          set(ref(db, 'players/' + myRole), {
-            p: rig.getAttribute('position'),
-            r: rig.getAttribute('rotation'),
-            s: document.getElementById('my-avatar').getAttribute('src')
-          });
-        }, 50);
+        async function startNetwork() {
+            // Sync ตำแหน่งเรา
+            setInterval(() => {
+                if(!player) return;
+                fetch(`${DB_URL}presence/${currentUser}.json`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        x: player.position.x, y: player.position.y, z: player.position.z,
+                        ry: player.rotation.y, isTrex: isTrex, 
+                        fruitLvl: gameData.fruit, hp: gameData.hp, maxHp: gameData.maxHp
+                    })
+                });
+            }, 100);
 
-        // ดึงตำแหน่งเพื่อน
-        ["P1", "P2", "P3"].forEach(id => {
-          if(id !== myRole) {
-            onValue(ref(db, 'players/' + id), (snap) => {
-              const data = snap.val();
-              if(data) {
-                const ent = document.getElementById('player-' + id);
-                ent.setAttribute('visible', 'true');
-                ent.setAttribute('position', data.p);
-                ent.setAttribute('rotation', data.r);
-                ent.querySelector('a-image').setAttribute('src', data.s);
-              }
+            // ดึงข้อมูลคนอื่น + เช็คเลือดตัวเอง
+            setInterval(async () => {
+                const res = await fetch(`${DB_URL}presence.json`);
+                const all = await res.json();
+                if(!all) return;
+
+                // อัปเดตเลือดเราจาก Server (กรณีเพื่อนตีเรา)
+                if(all[currentUser]) {
+                    gameData.hp = all[currentUser].hp;
+                    if(gameData.hp <= 0) {
+                        gameData.hp = gameData.maxHp;
+                        player.position.set(0, 5, 0);
+                        log("คุณตายแล้ว! เกิดใหม่...");
+                        saveToServer();
+                    }
+                    updateUI();
+                }
+
+                Object.keys(all).forEach(id => {
+                    if(id === currentUser) return;
+                    const d = all[id];
+                    if(!otherPlayers[id]) {
+                        const group = new THREE.Group();
+                        loader.load('bin.glb', g => { g.scene.name="h"; group.add(g.scene); });
+                        loader.load('T-Rex.glb', g => { 
+                            g.scene.name="t"; 
+                            g.scene.visible=false;
+                            g.scene.rotation.y = Math.PI; // หมุน 180 องศาแก้โมเดลหันหลัง
+                            group.add(g.scene); 
+                        });
+                        scene.add(group);
+                        otherPlayers[id] = { obj: group, hp: d.hp };
+                    }
+                    const p = otherPlayers[id].obj;
+                    p.position.set(d.x, d.y, d.z);
+                    p.rotation.y = d.ry;
+                    otherPlayers[id].hp = d.hp;
+
+                    const h = p.getObjectByName("h"), t = p.getObjectByName("t");
+                    if(h && t) {
+                        h.visible = !d.isTrex; t.visible = d.isTrex;
+                        if(d.isTrex) {
+                            const s = 4.5 + (d.fruitLvl * 0.5); // ขยาย T-Rex เพื่อน
+                            t.scale.set(s, s, s);
+                        }
+                    }
+                });
+            }, 300);
+        }
+
+        // --- Game Setup ---
+        function init3D() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x333333);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 15, 20);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.8), new THREE.DirectionalLight(0xffffff, 1));
+            const ground = new THREE.Mesh(new THREE.CylinderGeometry(50, 50, 2, 32), new THREE.MeshStandardMaterial({color: 0x114411}));
+            scene.add(ground);
+
+            player = new THREE.Group(); scene.add(player);
+            loader.load('bin.glb', g => { human = g.scene; player.add(human); });
+            loader.load('T-Rex.glb', g => { 
+                trex = g.scene; 
+                trex.visible = false;
+                trex.rotation.y = Math.PI; // หมุน 180 องศาแก้โมเดลหันหลัง
+                player.add(trex); 
             });
-          }
-        });
-      }
 
-      window.setMySkin = function(skinSrc) {
-        document.getElementById('my-avatar').setAttribute('src', skinSrc);
-        toggleCustomizeMenu();
-      }
-
-      // ระบบยิง
-      document.getElementById('shoot-btn').addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        const weapon = document.querySelector('#weapon');
-        weapon.setAttribute('position', '0 0 0.1'); 
-        setTimeout(() => weapon.setAttribute('position', '0 0 0'), 60);
-
-        const raycaster = document.querySelector('#crosshair').components.raycaster;
-        const intersections = raycaster.intersections;
-        if (intersections.length > 0) {
-          const target = intersections[0].object.el;
-          if (target.id === 'bot-enemy') {
-            let bHp = parseInt(target.getAttribute('data-hp')) - 25;
-            target.setAttribute('data-hp', bHp);
-            if (bHp <= 0) { target.setAttribute('visible', 'false'); setTimeout(() => { target.setAttribute('visible', 'true'); target.setAttribute('data-hp', 100); }, 3000); }
-          }
+            animate();
         }
-      });
 
-      function updateUI() {
-        document.getElementById('hp-text').innerText = health;
-        document.getElementById('health-fill').style.width = health + "%";
-      }
-
-      function initJoystick() {
-        const manager = nipplejs.create({ zone: document.getElementById('joystick-zone'), mode: 'static', position: {left: '70px', bottom: '70px'}, color: 'white' });
-        manager.on('move', (evt, data) => {
-          const rig = document.querySelector('#rig');
-          const cam = document.querySelector('#camera');
-          let rot = cam.getAttribute('rotation').y * Math.PI / 180;
-          let speed = 0.22;
-          let pos = rig.getAttribute('position');
-          let moveF = Math.sin(data.angle.radian) * speed;
-          let moveS = Math.cos(data.angle.radian) * speed;
-          pos.x -= (Math.sin(rot) * moveF + Math.cos(rot) * moveS);
-          pos.z -= (Math.cos(rot) * moveF - Math.sin(rot) * moveS);
-          rig.setAttribute('position', pos);
-        });
-      }
-    </script>
-    <script>
-      // ฟังก์ชันช่วยเหลือทั่วไป
-      const fsBtn = document.getElementById('fullscreen-btn');
-      fsBtn.addEventListener('click', () => {
-        if (!document.fullscreenElement) {
-          document.documentElement.requestFullscreen().then(() => { fsBtn.innerText = "🔙 ออก"; fsBtn.style.background = "#c0392b"; });
-        } else {
-          document.exitFullscreen(); fsBtn.innerText = "📱 เต็มจอ"; fsBtn.style.background = "#8e44ad";
+        function updateUI() {
+            document.getElementById('money').innerText = gameData.money;
+            document.getElementById('pts').innerText = gameData.pts;
+            document.getElementById('v-melee').innerText = gameData.melee;
+            document.getElementById('v-fruit').innerText = gameData.fruit;
+            document.getElementById('hp-text').innerText = Math.floor(gameData.hp);
+            document.getElementById('max-hp').innerText = gameData.maxHp;
+            document.getElementById('hp-fill').style.width = (gameData.hp/gameData.maxHp*100)+'%';
+            document.getElementById('m-val').innerText = gameData.mastery;
+            document.getElementById('m-fill').style.width = (gameData.mastery/5*100)+'%';
+            
+            if(gameData.hasFruit) {
+                document.getElementById('shop-part').style.display='none';
+                document.getElementById('item-part').style.display='block';
+            }
+            if(gameData.isEquipped) {
+                document.getElementById('equip-btn').innerText="สวมใส่แล้ว";
+                document.getElementById('equip-btn').disabled=true;
+            }
+            if(gameData.mastery >= 5) document.getElementById('trans-btn').style.display='flex';
         }
-      });
-      function toggleCustomizeMenu() { document.getElementById('customize-menu').classList.toggle('hidden'); }
+
+        // --- Combat PVP & Actions ---
+        async function attack() {
+            if(isAttacking) return;
+            isAttacking = true;
+
+            const damage = isTrex ? (20 + gameData.fruit*5) : (10 + gameData.melee*3);
+            const range = isTrex ? 8 : 4;
+
+            // ตีคนอื่น (PVP)
+            Object.keys(otherPlayers).forEach(async id => {
+                const target = otherPlayers[id].obj;
+                if(player.position.distanceTo(target.position) < range) {
+                    let newHp = otherPlayers[id].hp - damage;
+                    // ส่งดาเมจไปที่ Server ของเป้าหมาย
+                    fetch(`${DB_URL}presence/${id}/hp.json`, { method: 'PUT', body: newHp });
+                    log(`โจมตี ${id}! -${damage}`);
+                }
+            });
+
+            // อนิเมชั่น
+            if(isTrex) {
+                trex.rotation.x = 0.8;
+                setTimeout(() => { trex.rotation.x = 0; isAttacking = false; }, 300);
+            } else {
+                human.rotation.z = 0.7;
+                setTimeout(() => { human.rotation.z = 0; isAttacking = false; }, 200);
+            }
+        }
+
+        window.upStat = (s) => { if(gameData.pts > 0) { gameData.pts--; gameData[s]++; updateUI(); saveToServer(); } };
+        window.buyFruit = () => { if(gameData.money >= 100) { gameData.money -= 100; gameData.hasFruit = true; updateUI(); saveToServer(); } };
+        window.equipFruit = () => { gameData.isEquipped = true; updateUI(); saveToServer(); log("สวมใส่แล้ว! ฟาร์ม Mastery"); };
+        function log(t) { const m=document.getElementById('msg'); m.innerText=t; setTimeout(()=>m.innerText="", 2000); }
+
+        // --- Controls ---
+        let joyActive = false;
+        document.getElementById('joy-base').addEventListener('pointerdown', ()=> joyActive=true);
+        window.addEventListener('pointermove', e => {
+            if(!joyActive) return;
+            const rect = document.getElementById('joy-base').getBoundingClientRect();
+            const x = e.clientX-rect.left-50, y = e.clientY-rect.top-50;
+            const dist = Math.min(Math.sqrt(x*x+y*y), 40);
+            const ang = Math.atan2(y, x);
+            document.getElementById('joy-stick').style.transform = `translate(${Math.cos(ang)*dist}px, ${Math.sin(ang)*dist}px)`;
+            moveDir.set(Math.cos(ang), 0, Math.sin(ang)).multiplyScalar(dist/40);
+        });
+        window.addEventListener('pointerup', ()=>{ joyActive=false; document.getElementById('joy-stick').style.transform="translate(0,0)"; moveDir.set(0,0,0); });
+        
+        document.getElementById('atk-btn').addEventListener('pointerdown', attack);
+        document.getElementById('jump-btn').addEventListener('pointerdown', ()=>{ if(player.position.y <= 0.1) vY = 0.3; });
+        document.getElementById('trans-btn').addEventListener('pointerdown', ()=>{
+            isTrex = !isTrex; human.visible = !isTrex; trex.visible = isTrex;
+            const s = 5.0 + (gameData.fruit * 0.5); // ขนาด T-Rex ตัวเรา (ใหญ่ยักษ์)
+            trex.scale.set(s,s,s);
+            log(isTrex ? "แปลงร่าง!" : "กลับร่างมนุษย์");
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if(moveDir.length() > 0.1) {
+                player.position.add(moveDir.clone().multiplyScalar(0.25));
+                player.rotation.y = Math.atan2(moveDir.x, moveDir.z);
+            }
+            player.position.y += vY;
+            if(player.position.y > 0) vY -= 0.015; else { player.position.y = 0; vY = 0; }
+            
+            if(human && human.visible) human.position.y = Math.sin(Date.now()*0.005)*0.05;
+            if(trex && trex.visible) trex.position.y = Math.abs(Math.sin(Date.now()*0.01))*0.2;
+            
+            renderer.render(scene, camera);
+        }
     </script>
-  </body>
-</html>
+</body>
+  </html>
+  
