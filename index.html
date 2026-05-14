@@ -3,73 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>T-Rex Fruit - FIX VERSION</title>
+    <title>T-Rex Fruit - ADMIN JUSTICE FULL</title>
     <style>
-        /* CSS เหมือนเดิมทุกประการครับ (เพื่อความคลีน) */
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Tahoma', sans-serif; user-select: none; touch-action: none; }
+        
+        /* UI พื้นฐาน */
         #loading-screen { position: absolute; width:100%; height:100%; background:#111; display:flex; align-items:center; justify-content:center; z-index:9999; color:white; flex-direction: column; }
-        .login-box { background: rgba(0,0,0,0.9); padding: 40px; border-radius: 15px; border: 3px solid #ffd700; text-align: center; }
-        input#user-id { padding: 15px; font-size: 18px; border-radius: 8px; border: none; margin: 20px 0; width: 250px; text-align: center; background:#222; color:white; border: 1px solid #444; }
-        .start-btn { background: #ffd700; color: black; padding: 15px 50px; font-size: 22px; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; pointer-events: auto; }
+        .login-box { background: rgba(0,0,0,0.9); padding: 40px; border-radius: 15px; border: 2px solid #ffd700; text-align: center; box-shadow: 0 0 30px #ffd700; }
+        input#user-id { padding: 12px; font-size: 16px; border-radius: 8px; border: none; margin: 15px 0; width: 220px; text-align: center; background:#222; color:white; border: 1px solid #444; }
+        .start-btn { background: #ffd700; color: #000; padding: 12px 40px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; width: 100%; }
+
         #game-ui { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
         .pointer { pointer-events: auto; }
-        #stat-panel { position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.8); color: white; padding: 15px; border-radius: 12px; width: 180px; }
-        #admin-panel { position: absolute; top: 15px; left: 230px; display: none; flex-direction: column; gap: 8px; }
-        .admin-btn { background: #ff00ff; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 11px; cursor: pointer; pointer-events: auto; }
-        #chat-box { position: absolute; bottom: 20px; left: 20px; width: 320px; height: 240px; background: rgba(0,0,0,0.7); border-radius: 12px; display: flex; flex-direction: column; pointer-events: auto; }
-        #chat-messages { flex: 1; overflow-y: auto; padding: 12px; color: white; font-size: 13px; }
-        #chat-input-area { display: flex; padding: 10px; }
-        #chat-input { flex: 1; background: #111; border: 1px solid #333; color: white; padding: 8px; border-radius: 6px; }
-        #bounty-board { position: absolute; top: 70px; right: 15px; background: rgba(20,20,20,0.9); padding: 12px; border-radius: 10px; color: white; min-width: 190px; pointer-events: auto; }
-        #joy-base { position: absolute; bottom: 50px; right: 180px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-        #joy-stick { position: absolute; top: 25px; left: 25px; width: 50px; height: 50px; background: white; border-radius: 50%; opacity: 0.5; }
-        #actions { position: absolute; bottom: 40px; right: 30px; display: flex; flex-direction: column; gap: 15px; }
-        .btn-circle { width: 80px; height: 80px; background: rgba(0,0,0,0.6); border: 3px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
-        #announcement { position: absolute; top: 15%; width: 100%; text-align: center; color: #ffd700; font-size: 26px; font-weight: bold; display: none; }
+
+        /* Status & Admin Panel */
+        #stat-panel { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 10px; border-radius: 8px; border-left: 4px solid #00d4ff; backdrop-filter: blur(5px); min-width: 150px; }
+        #admin-tools { position: absolute; top: 90px; left: 10px; display: none; flex-direction: column; gap: 5px; }
+        .adm-btn { background: #ff00ff; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 10px; cursor: pointer; font-weight: bold; box-shadow: 0 3px 0 #800080; }
+
+        /* Bounty Board */
+        #bounty-board { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 8px; color: white; min-width: 150px; font-size: 11px; }
+        .adm-glow { color: #ff00ff; text-shadow: 0 0 10px #ff00ff; animation: glow 1s infinite alternate; font-weight: bold; }
+        @keyframes glow { from { opacity: 0.6; } to { opacity: 1; } }
+
+        /* Quest Dialog */
+        #dialog-box { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); border: 2px solid #ffd700; color: white; padding: 20px; border-radius: 15px; width: 280px; display: none; text-align: center; pointer-events: auto; }
+        .quest-btn { background: #ffd700; color: black; border: none; padding: 8px 20px; border-radius: 5px; margin-top: 10px; font-weight: bold; cursor: pointer; }
+
+        /* Hotbar */
+        #hotbar { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; pointer-events: auto; }
+        .slot { width: 55px; height: 55px; background: rgba(0,0,0,0.8); border: 2px solid #444; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; cursor: pointer; }
+        .slot.active { border-color: #ffd700; background: rgba(255,215,0,0.3); box-shadow: 0 0 15px #ffd700; }
+
+        /* Controls */
+        #joy-base { position: absolute; bottom: 40px; right: 130px; width: 85px; height: 85px; background: rgba(255,255,255,0.1); border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); }
+        #joy-stick { position: absolute; top: 22px; left: 22px; width: 40px; height: 40px; background: white; border-radius: 50%; opacity: 0.4; }
+        #atk-btn { position: absolute; bottom: 35px; right: 25px; width: 80px; height: 80px; background: rgba(255,0,0,0.5); border: 2px solid #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; pointer-events: auto; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    <div id="announcement"></div>
-
     <div id="loading-screen">
         <div class="login-box">
-            <h1>🦖 T-REX FRUIT</h1>
-            <input type="text" id="user-id" placeholder="Enter ID...">
+            <h1 style="color:#ffd700; margin:0;">🦖 T-REX FRUIT</h1>
+            <p style="color:#777; font-size:10px;">ID ของท่านคืออำนาจสูงสุด</p>
+            <input type="text" id="user-id" placeholder="ใส่ชื่อ ID...">
             <br>
-            <button class="start-btn" onclick="enterGame()">START GAME</button>
+            <button class="start-btn" onclick="enterGame()">LOGIN</button>
         </div>
     </div>
 
     <div id="game-ui">
         <div id="stat-panel" class="pointer">
-            <div id="adm-tag" style="color:#ff00ff; display:none;">GOD ADMIN</div>
-            <div id="display-id" style="font-size:18px; font-weight:bold;">...</div>
-            <div style="color:#00ff00;">฿<span id="money">0</span></div>
-            <div id="my-title" style="font-size:10px; color:#ffd700;">TITLE: ...</div>
+            <div id="display-id">...</div>
+            <div style="color:#0f0;">💰 ฿ <span id="money">0</span></div>
+            <div id="my-title" style="font-size:9px; color:#ffd700;">TITLE: Beginner</div>
         </div>
 
-        <div id="admin-panel">
-            <button class="admin-btn" onclick="addMoney()">+10k Money</button>
-            <button class="admin-btn" onclick="punishPlayer()">Punish</button>
-            <button class="admin-btn" onclick="getAxe()">Get Axe</button>
+        <div id="admin-tools" class="pointer">
+            <button class="adm-btn" onclick="addMoney()">เสกเงิน ฿100,000</button>
+            <button class="adm-btn" onclick="giveAxeToPlayer()">ประทานขวาน (Give Axe)</button>
+            <button class="adm-btn" onclick="punishPlayer()">ลงโทษเกรียน (Freeze)</button>
         </div>
 
-        <div id="bounty-board" class="pointer">
-            <div style="color:#ffd700; text-align:center;">🏆 BOUNTY RANK</div>
-            <div id="bounty-list" style="font-size:11px;"></div>
+        <div id="bounty-board">
+            <div style="color:#ffd700; text-align:center; font-size:10px;">🏆 TOP BOUNTY</div>
+            <div id="bounty-list"></div>
         </div>
 
-        <div id="chat-box">
-            <div id="chat-messages"></div>
-            <div id="chat-input-area"><input type="text" id="chat-input" placeholder="Chat..."></div>
+        <div id="dialog-box">
+            <h3 id="npc-name">NPC จอมกวน</h3>
+            <p id="npc-text">ว่าไงเจ้าหนู... อยากได้ค่าหัวเพิ่มเหรอ? ไปจัดการพวก Fae (กล่องเขียวบินได้) ให้ข้าดูหน่อยสิ!</p>
+            <button class="quest-btn" onclick="closeDialog()">ตกลง (รับเควส)</button>
+        </div>
+
+        <div id="hotbar">
+            <div class="slot active" id="slot-combat" onclick="selectWeapon('combat')">Combat</div>
+            <div class="slot" id="slot-axe" style="display:none;" onclick="selectWeapon('axe')">Axe (ขวาน)</div>
         </div>
 
         <div id="joy-base" class="pointer"><div id="joy-stick"></div></div>
-        <div id="actions" class="pointer">
-            <div class="btn-circle" id="atk-btn">ATK</div>
-            <div class="btn-circle" id="trans-btn" style="display:none; background:orange;">TRANS</div>
-        </div>
+        <div id="atk-btn" class="pointer">ATK</div>
     </div>
 
     <script type="importmap">
@@ -81,116 +95,155 @@
         import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
         const DB_URL = "https://the-herta-cf467-default-rtdb.asia-southeast1.firebasedatabase.app/";
-        let currentUser = "", isAdmin = false, isFrozen = false, currentServer = "Public-1";
+        let currentUser = "", isAdmin = false, currentWeapon = "combat";
         let gameData = { money: 0, bounty: 1000, hasFruit: false, fruitType: "none" };
         let scene, camera, renderer, player, models = {}, moveDir = new THREE.Vector3();
-        let isTrans = false, loader = new GLTFLoader(), enemies = [];
-        let camX = 0, camY = 0.3, isTouch = false, lastX, lastY;
+        let loader = new GLTFLoader(), enemies = [], camX = 0, isTouch = false, lastX;
 
-        // แก้ไข: ย้ายฟังก์ชันมาไว้ที่ window เพื่อให้ปุ่มเรียกหาเจอแน่นอน
         window.enterGame = async () => {
             const id = document.getElementById('user-id').value.trim();
             if(!id) return;
             currentUser = id;
-            if(id === "The Herta") isAdmin = true;
+            isAdmin = (id === "The Herta");
 
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('game-ui').style.display = 'block';
             document.getElementById('display-id').innerText = currentUser;
 
             if(isAdmin) {
-                document.getElementById('admin-panel').style.display = 'flex';
-                document.getElementById('adm-tag').style.display = 'block';
-                gameData.bounty = 9999999999999;
+                document.getElementById('admin-tools').style.display = 'flex';
+                document.getElementById('display-id').classList.add('adm-glow');
                 gameData.hasFruit = true; gameData.fruitType = "axe";
+                gameData.bounty = 999999999;
             }
-            init(); // เรียกการสร้างฉาก
+            init();
+            updateUI();
         };
 
-        function getTitle(bounty, isAdm) {
-            if (isAdm) return "👑 GOD ADMIN: THE HERTA";
-            if (bounty >= 1000000) return "🔱 Sea Master";
-            return "🐥 Beginner";
+        window.selectWeapon = (wp) => {
+            currentWeapon = wp;
+            document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
+            document.getElementById(`slot-${wp}`).classList.add('active');
+            if(models.axe) models.axe.visible = (wp === 'axe');
+        };
+
+        window.addMoney = () => { gameData.money += 100000; updateUI(); };
+        window.closeDialog = () => { document.getElementById('dialog-box').style.display = 'none'; };
+        
+        window.giveAxeToPlayer = () => {
+            const t = prompt("ใส่ ID ผู้เล่นที่จะได้รับพลังขวาน:");
+            if(t) alert("มอบพลังให้ " + t + " สำเร็จ! (ระบบจำลอง)");
+        };
+
+        function updateUI() {
+            document.getElementById('money').innerText = gameData.money.toLocaleString();
+            if(gameData.hasFruit) document.getElementById('slot-axe').style.display = 'flex';
+            let title = isAdmin ? "👑 GOD ADMIN" : (gameData.bounty > 1000000 ? "🔱 Sea Master" : "🐥 Beginner");
+            document.getElementById('my-title').innerText = "TITLE: " + title;
         }
 
-        // --- ส่วนแชทและดาต้า ---
-        setInterval(async () => {
-            if(!currentUser) return;
-            const srvKey = currentServer.replace("-", "_");
-            
-            // ดึง Bounty
-            fetch(`${DB_URL}bounty/${srvKey}/${currentUser}.json`, {
-                method: 'PUT', body: JSON.stringify({ name: currentUser, bounty: isAdmin ? 9999999999999 : gameData.bounty, isAdmin })
-            });
-
-            const res = await fetch(`${DB_URL}bounty/${srvKey}.json?orderBy="bounty"&limitToLast=3`);
-            const data = await res.json();
-            if(data) {
-                const sorted = Object.values(data).sort((a,b)=>b.bounty-a.bounty);
-                document.getElementById('bounty-list').innerHTML = sorted.map((p,i)=>`<div>${i+1}. ${p.name}: ฿${p.bounty.toLocaleString()}</div>`).join('');
-            }
-        }, 3000);
-
-        // --- เริ่มต้นฉาก ---
         function init() {
             scene = new THREE.Scene(); scene.background = new THREE.Color(0x87CEEB);
             camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
-
             scene.add(new THREE.AmbientLight(0xffffff, 0.8), new THREE.DirectionalLight(0xffffff, 1));
-            const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({color: 0x33aa33}));
-            ground.rotation.x = -Math.PI/2;
-            scene.add(ground);
+            
+            const ground = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), new THREE.MeshStandardMaterial({color: 0x2e7d32}));
+            ground.rotation.x = -Math.PI/2; scene.add(ground);
 
             player = new THREE.Group(); scene.add(player);
             
-            // โหลดโมเดล (ถ้าไม่มีไฟล์จะไม่ค้าง)
-            try {
-                loader.load('bin.glb', g => { models.human = g.scene; player.add(models.human); });
-                loader.load('axe.glb', g => { models.axe = g.scene; models.axe.visible = false; player.add(models.axe); });
-            } catch(e) {}
+            // โหลดโมเดลผู้เล่น (คน)
+            loader.load('bin.glb', g => { models.human = g.scene; player.add(models.human); });
+            
+            // โหลดโมเดลขวาน
+            loader.load('axe.glb', g => { 
+                models.axe = g.scene; models.axe.visible = false; 
+                models.axe.scale.set(6,6,6); models.axe.position.set(2,4,0); 
+                player.add(models.axe); 
+                if(isAdmin) selectWeapon('axe');
+            });
 
-            updateUI(); animate();
+            // NPC (คน - bin.glb)
+            loader.load('bin.glb', g => {
+                const npc = g.scene; npc.position.set(30, 0, -30);
+                npc.scale.set(3,3,3); npc.rotation.y = Math.PI;
+                scene.add(npc); models.npc = npc;
+            });
+
+            // มอนสเตอร์ (สัตว์ประหลาด - fae.glb)
+            for(let i=0; i<10; i++) {
+                loader.load('fae.glb', g => {
+                    const m = g.scene;
+                    m.position.set(Math.random()*250-125, 2, Math.random()*250-125);
+                    m.scale.set(5,5,5);
+                    scene.add(m);
+                    enemies.push({ obj: m, hp: 100 });
+                });
+            }
+            animate();
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            if(moveDir.length() > 0.1 && !isFrozen) {
+            if(moveDir.length() > 0.1) {
                 const forward = new THREE.Vector3(Math.sin(camX+Math.PI), 0, Math.cos(camX+Math.PI));
                 const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0), forward);
                 const move = forward.multiplyScalar(-moveDir.z).add(right.multiplyScalar(moveDir.x));
-                player.position.add(move.multiplyScalar(isAdmin ? 0.7 : 0.4));
+                player.position.add(move.multiplyScalar(isAdmin ? 1.2 : 0.5));
                 player.rotation.y = Math.atan2(move.x, move.z);
             }
-            camera.position.set(player.position.x + Math.sin(camX)*20, player.position.y + 15, player.position.z + Math.cos(camX)*20);
+            camera.position.set(player.position.x + Math.sin(camX)*35, player.position.y + 20, player.position.z + Math.cos(camX)*35);
             camera.lookAt(player.position);
+            
+            // ตรวจสอบระยะ NPC เพื่อคุย
+            if(models.npc && player.position.distanceTo(models.npc.position) < 12) {
+                document.getElementById('dialog-box').style.display = 'block';
+            } else {
+                document.getElementById('dialog-box').style.display = 'none';
+            }
+            
             renderer.render(scene, camera);
         }
 
-        window.addMoney = () => { gameData.money += 10000; updateUI(); };
-        window.getAxe = () => { gameData.hasFruit = true; gameData.fruitType = "axe"; updateUI(); };
-        function updateUI() {
-            document.getElementById('money').innerText = gameData.money.toLocaleString();
-            document.getElementById('my-title').innerText = "TITLE: " + getTitle(gameData.bounty, isAdmin);
-            if(gameData.hasFruit) document.getElementById('trans-btn').style.display = 'flex';
-        }
+        // ระบบโจมตี (แอดมินหมัดเดียวจอด)
+        document.getElementById('atk-btn').addEventListener('click', () => {
+            let dmg = 20;
+            if(currentWeapon === 'axe') dmg = isAdmin ? 999999 : 60;
 
-        // Joystick
+            enemies.forEach(en => {
+                if(player.position.distanceTo(en.obj.position) < 15) {
+                    en.hp -= dmg;
+                    if(en.hp <= 0) {
+                        en.obj.position.set(Math.random()*250-125, 2, Math.random()*250-125);
+                        en.hp = 100; gameData.money += 5000; updateUI();
+                    }
+                }
+            });
+            // อะนิเมชั่นตัวละครสั่นตอนโจมตี
+            player.position.y += 0.5; setTimeout(()=>player.position.y -= 0.5, 50);
+        });
+
+        // จอยสติ๊ก & มุมกล้อง
         let joyActive = false;
         document.getElementById('joy-base').addEventListener('pointerdown', ()=> joyActive=true);
         window.addEventListener('pointermove', e => {
             if(!joyActive) return;
             const rect = document.getElementById('joy-base').getBoundingClientRect();
-            const x = e.clientX-rect.left-50, y = e.clientY-rect.top-50;
-            const dist = Math.min(Math.sqrt(x*x+y*y), 40);
+            const x = e.clientX-rect.left-42, y = e.clientY-rect.top-42;
+            const dist = Math.min(Math.sqrt(x*x+y*y), 35);
             const ang = Math.atan2(y, x);
             document.getElementById('joy-stick').style.transform = `translate(${Math.cos(ang)*dist}px, ${Math.sin(ang)*dist}px)`;
             moveDir.set(Math.cos(ang), 0, Math.sin(ang));
         });
-        window.addEventListener('pointerup', ()=>{ joyActive=false; document.getElementById('joy-stick').style.transform="translate(0,0)"; moveDir.set(0,0,0); });
+        window.addEventListener('pointerup', ()=>{ joyActive=false; moveDir.set(0,0,0); document.getElementById('joy-stick').style.transform="translate(0,0)"; });
+        
+        window.addEventListener('pointerdown', e => { if(e.clientX > window.innerWidth/2) { isTouch=true; lastX=e.clientX; }});
+        window.addEventListener('pointermove', e => { if(isTouch) { camX -= (e.clientX - lastX) * 0.01; lastX=e.clientX; }});
+        window.addEventListener('pointerup', () => isTouch=false);
     </script>
 </body>
-    </html>
-                                               
+            </html>
+    
