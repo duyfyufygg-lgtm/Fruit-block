@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>T-Rex Fruit - ADMIN POSSESS EDITION</title>
+    <title>T-Rex Fruit - ADMIN VISION EDITION</title>
     <style>
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Tahoma', sans-serif; user-select: none; touch-action: none; }
         
@@ -41,7 +41,7 @@
     <div id="loading-screen">
         <div class="login-box">
             <h1 style="color:#ffd700; margin:0;">🦖 T-REX FRUIT</h1>
-            <p style="color:#777; font-size:10px;">ADMIN POSSESS SYSTEM ACTIVE</p>
+            <p style="color:#777; font-size:10px;">NAME TAG SYSTEM ENABLED</p>
             <input type="text" id="user-id" placeholder="ใส่ชื่อ ID...">
             <br>
             <button class="start-btn" onclick="enterGame()">LOGIN</button>
@@ -84,8 +84,8 @@
         let scene, camera, renderer, player, models = {}, moveDir = new THREE.Vector3();
         let loader = new GLTFLoader(), enemies = [], camX = 0, isTouch = false, lastX;
         
-        // Possess Variables
         let isPossessing = false, targetID = "", targetData = null;
+        let otherPlayers = {}; // เก็บตัวละครผู้เล่นอื่น
 
         window.enterGame = async () => {
             const id = document.getElementById('user-id').value.trim();
@@ -107,10 +107,29 @@
             updateUI();
         };
 
-        // --- ระบบสิงร่าง (The Ghost Admin) ---
+        // --- ฟังก์ชันสร้างป้ายชื่อ (Name Tag) ---
+        function createNameTag(name, color = "white") {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 256; canvas.height = 64;
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillRect(0, 0, 256, 64);
+            ctx.font = "Bold 40px Tahoma";
+            ctx.fillStyle = color;
+            ctx.textAlign = "center";
+            ctx.fillText(name, 128, 45);
+            
+            const tex = new THREE.CanvasTexture(canvas);
+            const spriteMat = new THREE.SpriteMaterial({ map: tex });
+            const sprite = new THREE.Sprite(spriteMat);
+            sprite.scale.set(8, 2, 1);
+            sprite.position.y = 8; // ลอยเหนือหัว
+            return sprite;
+        }
+
         window.togglePossess = () => {
             if (!isPossessing) {
-                const id = prompt("ระบุ ID ผู้เล่นที่ต้องการสิงร่าง:");
+                const id = prompt("ระบุ ID ผู้เล่นที่ต้องการสิงร่าง (ดูชื่อบนหัวเขาได้เลย):");
                 if (id && id !== currentUser) {
                     targetID = id;
                     isPossessing = true;
@@ -118,26 +137,54 @@
                     document.getElementById('possess-btn').classList.add('active');
                 }
             } else {
-                isPossessing = false;
-                targetID = "";
-                targetData = null;
+                isPossessing = false; targetID = ""; targetData = null;
                 document.getElementById('possess-btn').innerText = "สิงร่างผู้เล่น";
                 document.getElementById('possess-btn').classList.remove('active');
             }
         };
 
-        // ดึงตำแหน่งผู้เล่นอื่น (จำลองระบบ Multiplayer)
+        // Network Loop: อัปเดตตำแหน่งและโหลดผู้เล่นอื่น
         setInterval(async () => {
-            if (isPossessing && targetID) {
-                const res = await fetch(`${DB_URL}positions/${targetID}.json`);
-                targetData = await res.json();
-            }
-            // อัปเดตตำแหน่งตัวเองขึ้น DB
             if (currentUser) {
+                // ส่งตำแหน่งตัวเอง
                 fetch(`${DB_URL}positions/${currentUser}.json`, {
                     method: 'PUT',
-                    body: JSON.stringify({ x: player.position.x, y: player.position.y, z: player.position.z, rot: player.rotation.y })
+                    body: JSON.stringify({ x: player.position.x, y: player.position.y, z: player.position.z, rot: player.rotation.y, isAdmin: isAdmin })
                 });
+
+                // ดึงตำแหน่งทุกคนมาโชว์
+                const res = await fetch(`${DB_URL}positions.json`);
+                const allPos = await res.json();
+                
+                if (allPos) {
+                    for (let id in allPos) {
+                        if (id === currentUser) continue;
+                        
+                        if (!otherPlayers[id]) {
+                            // สร้างตัวละครใหม่ถ้ายังไม่มีในจอ
+                            const group = new THREE.Group();
+                            const nameColor = allPos[id].isAdmin ? "#ff00ff" : "white";
+                            group.add(createNameTag(id, nameColor));
+                            
+                            // โหลดโมเดลคน (bin.glb)
+                            loader.load('bin.glb', g => { 
+                                g.scene.scale.set(1,1,1);
+                                group.add(g.scene); 
+                            });
+                            
+                            scene.add(group);
+                            otherPlayers[id] = group;
+                        }
+                        
+                        // อัปเดตตำแหน่งเพื่อน
+                        otherPlayers[id].position.lerp(new THREE.Vector3(allPos[id].x, allPos[id].y, allPos[id].z), 0.2);
+                        otherPlayers[id].rotation.y = allPos[id].rot;
+
+                        if (isPossessing && id === targetID) {
+                            targetData = allPos[id];
+                        }
+                    }
+                }
             }
         }, 500);
 
@@ -166,19 +213,17 @@
             const ground = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), new THREE.MeshStandardMaterial({color: 0x2e7d32}));
             ground.rotation.x = -Math.PI/2; scene.add(ground);
 
-            player = new THREE.Group(); scene.add(player);
+            player = new THREE.Group(); 
+            // ใส่ป้ายชื่อตัวเอง
+            player.add(createNameTag(currentUser || "Me", isAdmin ? "#ff00ff" : "white"));
+            scene.add(player);
+
             loader.load('bin.glb', g => { models.human = g.scene; player.add(models.human); });
             loader.load('axe.glb', g => { 
                 models.axe = g.scene; models.axe.visible = false; 
                 models.axe.scale.set(6,6,6); models.axe.position.set(2,4,0); 
                 player.add(models.axe); 
                 if(isAdmin) selectWeapon('axe');
-            });
-
-            // NPC (bin.glb)
-            loader.load('bin.glb', g => {
-                const npc = g.scene; npc.position.set(30, 0, -30);
-                npc.scale.set(3,3,3); scene.add(npc);
             });
 
             // Monster (fae.glb)
@@ -197,7 +242,6 @@
             requestAnimationFrame(animate);
 
             if (isPossessing && targetData) {
-                // โหมดสิงร่าง: ตัวละครเราจะวาร์ปไปหาเป้าหมาย
                 player.position.lerp(new THREE.Vector3(targetData.x, targetData.y, targetData.z), 0.1);
                 player.rotation.y = targetData.rot;
             } else if (moveDir.length() > 0.1) {
@@ -245,4 +289,4 @@
     </script>
 </body>
     </html>
-                
+    
